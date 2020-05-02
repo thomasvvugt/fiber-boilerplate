@@ -1,0 +1,36 @@
+App:
+  ListenAddress: 3000
+  SuppressWWW: true
+  ForceHTTPS: false
+
+Database:
+  Driver: "mariadb"
+  Host: "localhost"
+  Port: "3306"
+  Username: "bpuser"
+  Password: "bppasswd"
+  Database: "boilerplate"
+
+Fiber:
+  ServerHeader: "fiber"
+  ETag: true
+  TemplateEngineName: "mustache"
+  TemplateFolder: "views"
+  TemplateExtension: ".mustache"
+  ReadTimeoutSeconds: 120
+  WriteTimeoutSeconds: 120
+  IdleTimeoutSeconds: 150
+
+Public:
+  Compress: true
+  ByteRange: true
+
+Logger:
+  Format: "${time} - ${ip} - ${method} \"${protocol}://${host}${path}\" - ${ua}\n"
+  TimeFormat: "rfc3339"
+
+Helmet:
+  HSTSMaxAge: 31536000
+  HSTSPreloadEnabled: true
+  ContentSecurityPolicy: "default-src: 'self'"
+  ReferrerPolicy: "no-referrer-when-downgrade"

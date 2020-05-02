@@ -5,7 +5,7 @@ import (
 	"github.com/thomasvvugt/fiber-boilerplate/database"
 	"github.com/thomasvvugt/fiber-boilerplate/models"
 	"github.com/thomasvvugt/fiber-boilerplate/routes"
-	
+
 	"fmt"
 	"log"
 	"os"
@@ -158,8 +158,8 @@ func setDefaultConfig() {
 	viper.SetDefault("Logger.Format", "${time} - ${ip} - ${method} ${path}\t${ua}\n")
 	viper.SetDefault("Logger.TimeFormat", "15:04:05")
 
-	viper.SetDefault("Recovery.Enabled", true)
-	viper.SetDefault("Recovery.Log", true)
+	viper.SetDefault("Recover.Enabled", true)
+	viper.SetDefault("Recover.Log", true)
 
 	viper.SetDefault("Compression.Enabled", true)
 
@@ -287,8 +287,11 @@ func convertLoggerConfig(config configuration.LoggerConfiguration) logger.Config
 func convertRecoverConfig(config configuration.RecoverConfiguration) recover.Config {
 	return recover.Config{
 		Handler: func(c *fiber.Ctx, err error) {
-			c.SendString(err.Error())
 			c.SendStatus(500)
+			data := fiber.Map{"error" : err.Error()}
+			if err := c.Render("errors/500", data); err != nil {
+				c.Status(500).Send(err.Error())
+			}
 		},
 		Log:     config.Log,
 	}

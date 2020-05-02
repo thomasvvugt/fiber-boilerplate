@@ -29,6 +29,9 @@ Logger:
   Format: "${time} - ${ip} - ${method} \"${protocol}://${host}${path}\" - ${ua}\n"
   TimeFormat: "rfc3339"
 
+Recover:
+  Log: false
+
 Helmet:
   HSTSMaxAge: 31536000
   HSTSPreloadEnabled: true

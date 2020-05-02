@@ -12,7 +12,7 @@ func Register(app *fiber.App) {
 	// Homepage
 	app.Get("/", controllers.Index)
 
-	// TODO: Fix panic route, this brings up an error
+	// Panic test route, this brings up an error
 	app.Get("/panic", func(c *fiber.Ctx) {
 		panic("Hi, I'm a panic error!")
 	})

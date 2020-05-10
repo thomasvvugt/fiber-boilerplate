@@ -1,16 +1,16 @@
 package routes
 
 import (
-	"github.com/gofiber/fiber"
+	Controller "github.com/thomasvvugt/fiber-boilerplate/app/controllers/web"
 
-	"github.com/thomasvvugt/fiber-boilerplate/controllers"
+	"github.com/gofiber/fiber"
 )
 
-func Register(app *fiber.App) {
+func RegisterWeb(app *fiber.App) {
 	// Register routes here!
 
 	// Homepage
-	app.Get("/", controllers.Index)
+	app.Get("/", Controller.Index)
 
 	// Panic test route, this brings up an error
 	app.Get("/panic", func(c *fiber.Ctx) {

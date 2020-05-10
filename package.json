@@ -1,13 +1,12 @@
 {
   "name": "fiber-boilerplate",
   "description": "A boilerplate for the Fiber web framework",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "repository": "https://github.com/thomasvvugt/fiber-boilerplate.git",
   "author": "Thomas van Vugt <56607882+thomasvvugt@users.noreply.github.com>",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npm run development",
     "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
     "watch": "npm run development -- --watch",

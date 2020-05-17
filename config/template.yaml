@@ -1,4 +1,2 @@
 Enabled: true
-Engine: "mustache"
-Folder: "./resources/views"
-Extension: ".mustache"
+Engine: "handlebars"

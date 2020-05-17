@@ -7,6 +7,9 @@ import (
 	"github.com/gofiber/helmet"
 	"github.com/gofiber/logger"
 	"github.com/gofiber/recover"
+	"github.com/gofiber/session"
+
+	hashing "github.com/thomasvvugt/fiber-hashing"
 )
 
 type Configuration struct {
@@ -19,6 +22,8 @@ type Configuration struct {
 	Compression compression.Config
 	CORS cors.Config
 	Helmet helmet.Config
+	Hash hashing.Config
+	Session session.Config
 	PublicPrefix string
 	PublicRoot string
 	Public fiber.Static
@@ -83,6 +88,22 @@ func LoadConfigurations() (config Configuration, err error) {
 	}
 	config.Enabled["helmet"] = helmetEnabled
 	config.Helmet = helmetConfig
+
+	// Load the hashing configuration
+	hashEnabled, hashConfig, err := loadHashConfiguration()
+	if err != nil {
+		return config, err
+	}
+	config.Enabled["hash"] = hashEnabled
+	config.Hash = hashConfig
+
+	// Load the session middleware configuration
+	sessionEnabled, sessionConfig, err := loadSessionConfiguration()
+	if err != nil {
+		return config, err
+	}
+	config.Enabled["session"] = sessionEnabled
+	config.Session = sessionConfig
 
 	// Load the public, static files configuration
 	publicEnabled, publicPrefix, publicRoot, publicConfig, err := loadPublicConfiguration()

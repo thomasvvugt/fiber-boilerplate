@@ -1,10 +1,10 @@
 package api
 
 import (
+	"github.com/gofiber/fiber"
+
 	"github.com/thomasvvugt/fiber-boilerplate/app/models"
 	"github.com/thomasvvugt/fiber-boilerplate/database"
-
-	"github.com/gofiber/fiber"
 )
 
 // Return all users as JSON

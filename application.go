@@ -1,12 +1,6 @@
 package main
 
 import (
-	"github.com/thomasvvugt/fiber-boilerplate/app/configuration"
-	"github.com/thomasvvugt/fiber-boilerplate/app/models"
-	"github.com/thomasvvugt/fiber-boilerplate/app/providers"
-	"github.com/thomasvvugt/fiber-boilerplate/database"
-	"github.com/thomasvvugt/fiber-boilerplate/routes"
-
 	"fmt"
 	"log"
 	"os"
@@ -18,6 +12,13 @@ import (
 	"github.com/gofiber/helmet"
 	"github.com/gofiber/logger"
 	"github.com/gofiber/recover"
+	"github.com/gofiber/session"
+
+	"github.com/thomasvvugt/fiber-boilerplate/app/configuration"
+	"github.com/thomasvvugt/fiber-boilerplate/app/models"
+	"github.com/thomasvvugt/fiber-boilerplate/app/providers"
+	"github.com/thomasvvugt/fiber-boilerplate/database"
+	"github.com/thomasvvugt/fiber-boilerplate/routes"
 )
 
 func main() {
@@ -75,6 +76,17 @@ func main() {
 		app.Use(helmet.New(config.Helmet))
 	}
 
+	// Use the Session Middleware if enabled
+	if config.Enabled["session"] {
+		// create session handler
+		providers.SetSessionProvider(session.New(config.Session))
+	}
+
+	// Set hashing provider
+	if config.Enabled["hash"] {
+		providers.SetHashProvider(config.Hash)
+	}
+
 	// Connect to a database
 	if config.Enabled["database"] {
 		database.Connect(&config.Database)
@@ -106,6 +118,9 @@ func main() {
 			c.Status(500).Send(err.Error())
 		}
 	})
+
+	// Set configuration provider
+	providers.SetConfiguration(&config)
 
 	// Close any connections on interrupt signal
 	c := make(chan os.Signal, 1)

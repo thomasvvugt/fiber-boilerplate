@@ -53,3 +53,24 @@ yarn run watch
 # Run all Mix tasks with hot module replacement
 yarn run hot
 ```
+
+## Docker
+You can run your own application using the Docker example image.
+To build and run the Docker image, you can use the following commands.
+
+```bash
+docker build -t fiber-boilerplate .
+docker run --name fiber-boilerplate -p 3000:3000 fiber-boilerplate
+```
+
+## Live Reloading (Air)
+Example configuration files for [Air](https://github.com/cosmtrek/air) have also been included.
+This allows you to live reload your Go application when you change a model, view or controller.
+
+To run Air, use the following commands. Also, check out [Air its documentation](https://github.com/cosmtrek/air) about running the `air` command.
+```bash
+# Windows
+air -c .air.windows.conf
+# Linux
+air -c .air.linux.conf
+```

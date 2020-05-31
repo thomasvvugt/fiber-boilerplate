@@ -1,8 +1,6 @@
 Prefork: true
 ServerHeader: "fiber"
 ETag: true
-TemplateFolder: "./resources/views"
-TemplateExtension: ".hbs"
 ReadTimeout: "120s"
 WriteTimeout: "120s"
 IdleTimeout: "150s"

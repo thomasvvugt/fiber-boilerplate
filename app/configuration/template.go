@@ -1,14 +1,21 @@
 package configuration
 
 import (
+	"github.com/gofiber/fiber"
+	"github.com/spf13/viper"
 	"strings"
 
-	"github.com/gofiber/template"
-
-	"github.com/spf13/viper"
+	"github.com/gofiber/template/ace"
+	"github.com/gofiber/template/amber"
+	"github.com/gofiber/template/django"
+	"github.com/gofiber/template/handlebars"
+	"github.com/gofiber/template/html"
+	"github.com/gofiber/template/jet"
+	"github.com/gofiber/template/mustache"
+	"github.com/gofiber/template/pug"
 )
 
-func loadTemplateConfiguration() (enabled bool, engine func(raw string, bind interface{}) (out string, err error)) {
+func loadTemplateConfiguration() (enabled bool, engine fiber.Templates) {
 	// Set a new configuration provider
 	provider := viper.New()
 
@@ -24,16 +31,22 @@ func loadTemplateConfiguration() (enabled bool, engine func(raw string, bind int
 
 	// Go over the provided configuration
 	switch strings.ToLower(provider.GetString("Engine")) {
-		case "mustache":
-			engine = template.Mustache()
+		case "ace":
+			engine = ace.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		case "amber":
-			engine = template.Amber()
+			engine = amber.New(provider.GetString("Folder"), provider.GetString("Extension"))
+		case "django":
+			engine = django.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		case "handlebars":
-			engine = template.Handlebars()
+			engine = handlebars.New(provider.GetString("Folder"), provider.GetString("Extension"))
+		case "jet":
+			engine = jet.New(provider.GetString("Folder"), provider.GetString("Extension"))
+		case "mustache":
+			engine = mustache.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		case "pug":
-			engine = template.Pug()
+			engine = pug.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		default:
-			engine = nil
+			engine = html.New(provider.GetString("Folder"), provider.GetString("Extension"))
 	}
 
 	// Return the configuration
@@ -44,4 +57,6 @@ func loadTemplateConfiguration() (enabled bool, engine func(raw string, bind int
 func setDefaultTemplateConfiguration(provider *viper.Viper) {
 	provider.SetDefault("Enabled", false)
 	provider.SetDefault("Engine", nil)
+	provider.SetDefault("Folder", "./views")
+	provider.SetDefault("Extension", ".html")
 }

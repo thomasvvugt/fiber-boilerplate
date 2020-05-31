@@ -63,7 +63,11 @@ func LoadConfigurations() (config Configuration, err error) {
 	config.Recover = recoverConfig
 
 	// Load the template middleware configuration
-	config.Enabled["template"], config.TemplateEngine = loadTemplateConfiguration()
+	var templates fiber.Templates
+	config.Enabled["template"], templates = loadTemplateConfiguration()
+	if config.Enabled["template"] {
+		config.Fiber.Templates = templates
+	}
 
 	// Load the compression middleware configuration
 	compressionEnabled, compressionConfig, err := loadCompressionConfiguration()

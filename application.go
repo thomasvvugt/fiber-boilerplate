@@ -42,11 +42,6 @@ func main() {
 		app.Use(recover.New(config.Recover))
 	}
 
-	// Set the Template Middleware configuration
-	if config.Enabled["template"] {
-		app.Settings.TemplateEngine = config.TemplateEngine
-	}
-
 	// Use HTTP best practices
 	app.Use(func(c *fiber.Ctx) {
 		// Suppress the `www.` at the beginning of URLs

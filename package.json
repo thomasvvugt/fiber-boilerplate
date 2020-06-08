@@ -1,7 +1,7 @@
 {
   "name": "fiber-boilerplate",
   "description": "A boilerplate for the Fiber web framework",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": "https://github.com/thomasvvugt/fiber-boilerplate.git",
   "author": "Thomas van Vugt <56607882+thomasvvugt@users.noreply.github.com>",
   "license": "MIT",

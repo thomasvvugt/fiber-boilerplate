@@ -2,6 +2,6 @@
 # Host: "host.docker.internal"
 # or
 # Host: "172.17.0.1"
-Username: "root"
-Password: "secret"
-Database: "boilerplate"
+Username: "fiber"
+Password: "password"
+Database: "database"

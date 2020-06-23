@@ -15,7 +15,7 @@ import (
 	"github.com/gofiber/template/pug"
 )
 
-func loadTemplateConfiguration() (enabled bool, engine fiber.Templates) {
+func loadTemplateConfiguration() (enabled bool, views fiber.Views) {
 	// Set a new configuration provider
 	provider := viper.New()
 
@@ -32,25 +32,25 @@ func loadTemplateConfiguration() (enabled bool, engine fiber.Templates) {
 	// Go over the provided configuration
 	switch strings.ToLower(provider.GetString("Engine")) {
 		case "ace":
-			engine = ace.New(provider.GetString("Folder"), provider.GetString("Extension"))
+			views = ace.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		case "amber":
-			engine = amber.New(provider.GetString("Folder"), provider.GetString("Extension"))
+			views = amber.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		case "django":
-			engine = django.New(provider.GetString("Folder"), provider.GetString("Extension"))
+			views = django.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		case "handlebars":
-			engine = handlebars.New(provider.GetString("Folder"), provider.GetString("Extension"))
+			views = handlebars.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		case "jet":
-			engine = jet.New(provider.GetString("Folder"), provider.GetString("Extension"))
+			views = jet.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		case "mustache":
-			engine = mustache.New(provider.GetString("Folder"), provider.GetString("Extension"))
+			views = mustache.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		case "pug":
-			engine = pug.New(provider.GetString("Folder"), provider.GetString("Extension"))
+			views = pug.New(provider.GetString("Folder"), provider.GetString("Extension"))
 		default:
-			engine = html.New(provider.GetString("Folder"), provider.GetString("Extension"))
+			views = html.New(provider.GetString("Folder"), provider.GetString("Extension"))
 	}
 
 	// Return the configuration
-	return provider.GetBool("Enabled"), engine
+	return provider.GetBool("Enabled"), views
 }
 
 // Set default configuration for the Template Middleware

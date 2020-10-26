@@ -1,5 +1,5 @@
-# Fiber Boilerplate
-A boilerplate for the Fiber web framework
+# Fiber V2 Boilerplate 
+A boilerplate for the Fiber web framework V2 forked from thomasvvugt/fiber-boilerplate
 
 
 ## Configuration

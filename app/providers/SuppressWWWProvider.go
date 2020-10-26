@@ -3,7 +3,7 @@ package providers
 import (
 	"strings"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 // Suppress the `www.` at the beginning of URLs

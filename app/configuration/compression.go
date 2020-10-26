@@ -1,11 +1,11 @@
 package configuration
 
 import (
-	"github.com/gofiber/compression"
+	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/spf13/viper"
 )
 
-func loadCompressionConfiguration() (enabled bool, config compression.Config, err error) {
+func loadCompressionConfiguration() (enabled bool, config compress.Config, err error) {
 	// Set a new configuration provider
 	provider := viper.New()
 

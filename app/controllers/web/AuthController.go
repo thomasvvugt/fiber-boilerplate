@@ -2,20 +2,22 @@ package web
 
 import (
 	"fmt"
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"log"
 	"strings"
 
-	"github.com/thomasvvugt/fiber-boilerplate/app/providers"
+	"go-fiber-v2-boilerplate/app/providers"
 )
 
-func ShowLoginForm(c *fiber.Ctx) {
+func ShowLoginForm(c *fiber.Ctx) error {
 	if err := c.Render("login", fiber.Map{}); err != nil {
-		c.Status(500).Send(err.Error())
+		c.Status(500).SendString(err.Error())
+		return err
 	}
+	return nil
 }
 
-func PostLoginForm(c *fiber.Ctx) {
+func PostLoginForm(c *fiber.Ctx) error {
 	username := c.FormValue("username")
 	// Find user
 	user, err := FindUserByUsername(username)
@@ -35,16 +37,17 @@ func PostLoginForm(c *fiber.Ctx) {
 			// Set the user ID in the session store
 			store.Set("userid", user.ID)
 			fmt.Printf("User set in session store with ID: %v\n", user.ID)
-			c.Send("You should be logged in successfully!")
+			c.SendString("You should be logged in successfully!")
 		} else {
-			c.Send("The entered details do not match our records.")
+			c.SendString("The entered details do not match our records.")
 		}
 	} else {
 		panic("Hash provider was not set")
 	}
+	return nil
 }
 
-func PostLogoutForm(c *fiber.Ctx) {
+func PostLogoutForm(c *fiber.Ctx) error {
 	if providers.IsAuthenticated(c) {
 		store := providers.SessionProvider().Get(c)
 		store.Delete("userid")
@@ -56,8 +59,9 @@ func PostLogoutForm(c *fiber.Ctx) {
 		if strings.ToLower(split[0]) == "cookie" {
 			// Unset cookie on client-side
 			c.Set("Set-Cookie", split[1] + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; HttpOnly")
-			c.Send("You are now logged out.")
-			return
+			c.SendString("You are now logged out.")
+			return nil
 		}
 	}
+	return nil
 }

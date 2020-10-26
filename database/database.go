@@ -1,7 +1,7 @@
 package database
 
 import (
-	"github.com/thomasvvugt/fiber-boilerplate/app/configuration"
+	"go-fiber-v2-boilerplate/app/configuration"
 
 	"strings"
 

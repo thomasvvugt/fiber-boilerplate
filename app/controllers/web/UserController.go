@@ -3,8 +3,8 @@ package web
 import (
 	"errors"
 
-	"github.com/thomasvvugt/fiber-boilerplate/app/models"
-	"github.com/thomasvvugt/fiber-boilerplate/database"
+	"go-fiber-v2-boilerplate/app/models"
+	"go-fiber-v2-boilerplate/database"
 )
 
 // Return a single user as JSON

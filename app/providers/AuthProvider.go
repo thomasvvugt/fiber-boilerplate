@@ -1,6 +1,6 @@
 package providers
 
-import "github.com/gofiber/fiber"
+import "github.com/gofiber/fiber/v2"
 
 type Config struct {
 	Username string

@@ -1,7 +1,7 @@
 package configuration
 
 import (
-	"github.com/gofiber/helmet"
+	"github.com/gofiber/helmet/v2"
 	"github.com/spf13/viper"
 )
 

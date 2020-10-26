@@ -1,13 +1,13 @@
 package web
 
 import (
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 	"log"
 
-	"github.com/thomasvvugt/fiber-boilerplate/app/providers"
+	"go-fiber-v2-boilerplate/app/providers"
 )
 
-func Index(c *fiber.Ctx) {
+func Index(c *fiber.Ctx) error {
 	auth := providers.IsAuthenticated(c)
 	// Bind data to template
 	bind := fiber.Map{
@@ -21,11 +21,14 @@ func Index(c *fiber.Ctx) {
 		user, err := FindUserByID(userID)
 		if err != nil {
 			log.Fatalf("Error when finding user by ID: %v", err)
+			return err
 		}
 		bind["username"] = user.Name
 	}
 	// Render template
 	if err := c.Render("index", bind); err != nil {
-		c.Status(500).Send(err.Error())
+		c.Status(500).SendString(err.Error())
+		return err
 	}
+	return nil
 }

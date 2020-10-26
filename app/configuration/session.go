@@ -7,7 +7,7 @@ import (
 
 	fsession "github.com/fasthttp/session/v2"
 	"github.com/fasthttp/session/v2/providers/memory"
-	"github.com/gofiber/session"
+	"github.com/gofiber/session/v2"
 	"github.com/gofiber/session/provider/redis"
 
 	"github.com/spf13/viper"

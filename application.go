@@ -6,19 +6,19 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/gofiber/compression"
-	"github.com/gofiber/cors"
-	"github.com/gofiber/fiber"
-	"github.com/gofiber/helmet"
-	"github.com/gofiber/logger"
-	"github.com/gofiber/recover"
-	"github.com/gofiber/session"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/helmet/v2"
+	"github.com/gofiber/session/v2"
 
-	"github.com/thomasvvugt/fiber-boilerplate/app/configuration"
-	"github.com/thomasvvugt/fiber-boilerplate/app/models"
-	"github.com/thomasvvugt/fiber-boilerplate/app/providers"
-	"github.com/thomasvvugt/fiber-boilerplate/database"
-	"github.com/thomasvvugt/fiber-boilerplate/routes"
+	"go-fiber-v2-boilerplate/app/configuration"
+	"go-fiber-v2-boilerplate/app/models"
+	"go-fiber-v2-boilerplate/app/providers"
+	"go-fiber-v2-boilerplate/database"
+	"go-fiber-v2-boilerplate/routes"
 )
 
 func main() {
@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// Create a new Fiber application
-	app := fiber.New(&config.Fiber)
+	app := fiber.New(config.Fiber)
 
 	// Use the Logger Middleware if enabled
 	if config.Enabled["logger"] {
@@ -43,7 +43,7 @@ func main() {
 	}
 
 	// Use HTTP best practices
-	app.Use(func(c *fiber.Ctx) {
+	app.Use(func(c *fiber.Ctx) error {
 		// Suppress the `www.` at the beginning of URLs
 		if config.App.SuppressWWW {
 			providers.SuppressWWW(c)
@@ -53,12 +53,12 @@ func main() {
 			providers.ForceHTTPS(c)
 		}
 		// Move on the the next route
-		c.Next()
+		return c.Next()
 	})
 
 	// Use the Compression Middleware if enabled
 	if config.Enabled["compression"] {
-		app.Use(compression.New(config.Compression))
+		app.Use(compress.New(config.Compression))
 	}
 
 	// Use the CORS Middleware if enabled
@@ -97,8 +97,8 @@ func main() {
 	routes.RegisterWeb(app)
 
 	// Register application API routes (using the /api/v1 group)
-	api := app.Group("/api")
-	apiv1 := api.Group("/v1")
+	api := app.Group("/api").(*fiber.Group)
+	apiv1 := api.Group("/v1").(*fiber.Group)
 	routes.RegisterAPI(apiv1)
 
 	// Serve public, static files
@@ -107,11 +107,12 @@ func main() {
 	}
 
 	// Custom 404-page
-	app.Use(func(c *fiber.Ctx) {
-		c.SendStatus(404)
+	app.Use(func(c *fiber.Ctx) error {
+
 		if err := c.Render("errors/404", fiber.Map{}); err != nil {
-			c.Status(500).Send(err.Error())
+			c.Status(500).SendString(err.Error())
 		}
+		return c.Status(fiber.StatusNotFound).SendString("Sorry can't find that!")
 	})
 
 	// Set configuration provider
@@ -126,7 +127,7 @@ func main() {
 	}()
 
 	// Start listening on the specified address
-	err = app.Listen(config.App.Listen)
+	err = app.Listen(fmt.Sprintf(":%v",config.App.Listen))
 	if err != nil {
 		// Exit the application
 		exit(&config, app, err)

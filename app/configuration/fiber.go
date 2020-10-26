@@ -1,12 +1,12 @@
 package configuration
 
 import (
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 
 	"github.com/spf13/viper"
 )
 
-func loadFiberConfiguration() (settings fiber.Settings, err error) {
+func loadFiberConfiguration() (settings fiber.Config, err error) {
 	// Set a new configuration provider
 	provider := viper.New()
 

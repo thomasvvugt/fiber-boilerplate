@@ -1,25 +1,26 @@
 package configuration
 
 import (
-	"github.com/gofiber/compression"
-	"github.com/gofiber/cors"
-	"github.com/gofiber/fiber"
-	"github.com/gofiber/helmet"
-	"github.com/gofiber/logger"
-	"github.com/gofiber/recover"
-	"github.com/gofiber/session"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/helmet/v2"
+
+	"github.com/gofiber/session/v2"
 
 	hashing "github.com/thomasvvugt/fiber-hashing"
 )
 
 type Configuration struct {
-	Fiber fiber.Settings
+	Fiber fiber.Config
 	App ApplicationConfiguration
 	Enabled map[string]bool
 	Logger logger.Config
 	Recover recover.Config
 	TemplateEngine func(raw string, bind interface{}) (out string, err error)
-	Compression compression.Config
+	Compression compress.Config
 	CORS cors.Config
 	Helmet helmet.Config
 	Hash hashing.Config

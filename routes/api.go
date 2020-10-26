@@ -1,9 +1,9 @@
 package routes
 
 import (
-	Controller "github.com/thomasvvugt/fiber-boilerplate/app/controllers/api"
+	Controller "go-fiber-v2-boilerplate/app/controllers/api"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 func RegisterAPI(api *fiber.Group) {

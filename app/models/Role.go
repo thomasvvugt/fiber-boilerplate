@@ -1,7 +1,7 @@
 package models
 
 import (
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 // Role Inject fields `ID`, `CreatedAt`, `UpdatedAt`, `DeletedAt` into model`

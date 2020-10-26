@@ -1,6 +1,6 @@
 package providers
 
-import "github.com/gofiber/session"
+import "github.com/gofiber/session/v2"
 
 var sessionP *session.Session
 

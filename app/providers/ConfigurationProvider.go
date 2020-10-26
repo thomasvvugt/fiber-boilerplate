@@ -1,6 +1,6 @@
 package providers
 
-import "github.com/thomasvvugt/fiber-boilerplate/app/configuration"
+import "go-fiber-v2-boilerplate/app/configuration"
 
 var appConfig *configuration.Configuration
 

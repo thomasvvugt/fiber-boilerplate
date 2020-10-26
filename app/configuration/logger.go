@@ -3,7 +3,7 @@ package configuration
 import (
 	"os"
 
-	"github.com/gofiber/logger"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 
 	"github.com/spf13/viper"
 )

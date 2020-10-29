@@ -1,7 +1,7 @@
 {
   "name": "fiber-boilerplate",
   "description": "A boilerplate for the Fiber web framework",
-  "version": "0.0.7",
+  "version": "develop",
   "repository": "https://github.com/thomasvvugt/fiber-boilerplate.git",
   "author": "Thomas van Vugt <56607882+thomasvvugt@users.noreply.github.com>",
   "license": "MIT",
@@ -16,10 +16,10 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
-    "laravel-mix": "^5.0.4",
+    "laravel-mix": "^5.0.7",
     "resolve-url-loader": "^3.1.0",
-    "sass": "^1.26.5",
+    "sass": "^1.27.1",
     "sass-loader": "^8.0.2",
-    "vue-template-compiler": "^2.6.11"
+    "vue-template-compiler": "^2.6.12"
   }
 }

@@ -1,32 +1,33 @@
 package routes
 
 import (
-	Controller "github.com/thomasvvugt/fiber-boilerplate/app/controllers/api"
+	Controller "fiber-boilerplate/app/controllers/api"
+	"fiber-boilerplate/database"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
-func RegisterAPI(api *fiber.Group) {
-	registerRoles(api)
-	registerUsers(api)
+func RegisterAPI(api fiber.Router, db *database.Database) {
+	registerRoles(api, db)
+	registerUsers(api, db)
 }
 
-func registerRoles(api *fiber.Group) {
+func registerRoles(api fiber.Router, db *database.Database) {
 	roles := api.Group("/roles")
 
-	roles.Get("/", Controller.GetAllRoles)
-	roles.Get("/:id", Controller.GetRole)
-	roles.Post("/", Controller.AddRole)
-	roles.Put("/:id", Controller.EditRole)
-	roles.Delete("/:id", Controller.DeleteRole)
+	roles.Get("/", Controller.GetAllRoles(db))
+	roles.Get("/:id", Controller.GetRole(db))
+	roles.Post("/", Controller.AddRole(db))
+	roles.Put("/:id", Controller.EditRole(db))
+	roles.Delete("/:id", Controller.DeleteRole(db))
 }
 
-func registerUsers(api *fiber.Group) {
+func registerUsers(api fiber.Router, db *database.Database) {
 	users := api.Group("/users")
 
-	users.Get("/", Controller.GetAllUsers)
-	users.Get("/:id", Controller.GetUser)
-	users.Post("/", Controller.AddUser)
-	users.Put("/:id", Controller.EditUser)
-	users.Delete("/:id", Controller.DeleteUser)
+	users.Get("/", Controller.GetAllUsers(db))
+	users.Get("/:id", Controller.GetUser(db))
+	users.Post("/", Controller.AddUser(db))
+	users.Put("/:id", Controller.EditUser(db))
+	users.Delete("/:id", Controller.DeleteUser(db))
 }

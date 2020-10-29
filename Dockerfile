@@ -1,16 +1,8 @@
-FROM golang:1.14 AS build
+FROM golang:1.15
 
-WORKDIR /go/src/build
+WORKDIR /go/src/app
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o ./app ./application.go
 
-FROM alpine:latest
+RUN go get -d -v ./...
 
-WORKDIR /go/src/deploy
-COPY --from=build /go/src/build .
-RUN chmod +x ./app
-
-# You might need to change this settings according to your configuration
-EXPOSE 3000
-
-CMD ["./app"]
+ENTRYPOINT ["/bin/bash", "-c", "go run main.go"]

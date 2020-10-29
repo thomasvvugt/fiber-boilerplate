@@ -2,17 +2,15 @@ package web
 
 import (
 	"errors"
-
-	"github.com/thomasvvugt/fiber-boilerplate/app/models"
-	"github.com/thomasvvugt/fiber-boilerplate/database"
+	"fiber-boilerplate/app/models"
+	"fiber-boilerplate/database"
 )
 
 // Return a single user as JSON
-func FindUserByUsername(username string) (*models.User, error) {
-	db := database.Instance()
+func FindUserByUsername(db *database.Database, username string) (*models.User, error) {
 	User := new(models.User)
-	if res := db.Where("name = ?", username).First(&User); res.Error != nil {
-		return User, res.Error
+	if response := db.Where("name = ?", username).First(&User); response.Error != nil {
+		return nil, response.Error
 	}
 	if User.ID == 0 {
 		return User, errors.New("user not found")
@@ -31,11 +29,10 @@ func FindUserByUsername(username string) (*models.User, error) {
 }
 
 // Return a single user as JSON
-func FindUserByID(id int64) (*models.User, error) {
-	db := database.Instance()
+func FindUserByID(db *database.Database, id int64) (*models.User, error) {
 	User := new(models.User)
-	if res := db.Where("id = ?", id).First(&User); res.Error != nil {
-		return User, res.Error
+	if response := db.Where("id = ?", id).First(&User); response.Error != nil {
+		return nil, response.Error
 	}
 	if User.ID == 0 {
 		return User, errors.New("user not found")

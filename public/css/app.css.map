@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack:///./resources/assets/sass/D:/Thomas/Documents/go/src/fiber-boilerplate/resources/assets/sass/app.scss"],"names":[],"mappings":"AAAA,KACE,SACF","file":"public/css/app.css","sourcesContent":["html {\r\n  color: red;\r\n}"],"sourceRoot":""}

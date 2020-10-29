@@ -1,8 +1,6 @@
 package models
 
-import (
-	"github.com/jinzhu/gorm"
-)
+import "gorm.io/gorm"
 
 // User model
 type User struct {
@@ -11,5 +9,5 @@ type User struct {
 	Password string `json:"-" xml:"-" form:"-" query:"-"`
 	Email string
 	RoleID uint `gorm:"column:role_id" json:"role_id"`
-	Role Role
+	Role Role `gorm:"foreignKey:RoleID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT;"`
 }

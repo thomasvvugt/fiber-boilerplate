@@ -25,23 +25,22 @@ import (
 	"github.com/gofiber/template/mustache"
 	"github.com/gofiber/template/pug"
 
-	fsession "github.com/fasthttp/session/v2"
-	"github.com/gofiber/session/v2"
-	"github.com/gofiber/session/v2/provider/memcache"
-	"github.com/gofiber/session/v2/provider/mysql"
-	"github.com/gofiber/session/v2/provider/postgres"
-	"github.com/gofiber/session/v2/provider/redis"
-	"github.com/gofiber/session/v2/provider/sqlite3"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	"github.com/gofiber/storage/memcache"
+	fMysql "github.com/gofiber/storage/mysql"
+	fPostgres "github.com/gofiber/storage/postgres"
+	fRedis "github.com/gofiber/storage/redis"
+	fSQLite "github.com/gofiber/storage/sqlite3"
 )
 
 type Config struct {
 	*viper.Viper
 
 	errorHandler fiber.ErrorHandler
-	fiber *fiber.Config
+	fiber        *fiber.Config
 }
 
-var defaultErrorHandler = func (c *fiber.Ctx, err error) error {
+var defaultErrorHandler = func(c *fiber.Ctx, err error) error {
 	// Status code defaults to 500
 	code := fiber.StatusInternalServerError
 
@@ -61,7 +60,7 @@ var defaultErrorHandler = func (c *fiber.Ctx, err error) error {
 	c.Status(code)
 
 	// Render default error view
-	err = c.Render("errors/" + strconv.Itoa(code), fiber.Map{"message": message})
+	err = c.Render("errors/"+strconv.Itoa(code), fiber.Map{"message": message})
 	if err != nil {
 		return c.SendString(message)
 	}
@@ -110,7 +109,7 @@ func (config *Config) SetErrorHandler(errorHandler fiber.ErrorHandler) {
 	config.errorHandler = errorHandler
 }
 
-func (config *Config) setDefaults()  {
+func (config *Config) setDefaults() {
 	// Set default App configuration
 	config.SetDefault("APP_ADDR", ":8080")
 	config.SetDefault("APP_ENV", "local")
@@ -266,102 +265,102 @@ func (config *Config) setDefaults()  {
 func (config *Config) getFiberViewsEngine() fiber.Views {
 	var viewsEngine fiber.Views
 	switch strings.ToLower(config.GetString("FIBER_VIEWS")) {
-		case "ace":
-			// Set file extension dynamically to FIBER_VIEWS
-			if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
-				config.Set("FIBER_VIEWS_EXTENSION", ".ace")
-			}
-			engine := ace.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
-			engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
-				Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
-				Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
-				Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
-			viewsEngine = engine
-			break
-		case "amber":
-			// Set file extension dynamically to FIBER_VIEWS
-			if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
-				config.Set("FIBER_VIEWS_EXTENSION", ".amber")
-			}
-			engine := amber.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
-			engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
-				Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
-				Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
-				Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
-			viewsEngine = engine
-			break
-		case "django":
-			// Set file extension dynamically to FIBER_VIEWS
-			if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
-				config.Set("FIBER_VIEWS_EXTENSION", ".django")
-			}
-			engine := django.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
-			engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
-				Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
-				Layout(config.GetString("FIBER_VIEWS_LAYOUT"))
-			viewsEngine = engine
-			break
-		case "handlebars":
-			// Set file extension dynamically to FIBER_VIEWS
-			if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
-				config.Set("FIBER_VIEWS_EXTENSION", ".hbs")
-			}
-			engine := handlebars.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
-			engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
-				Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
-				Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
-				Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
-			viewsEngine = engine
-			break
-		case "jet":
-			// Set file extension dynamically to FIBER_VIEWS
-			if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
-				config.Set("FIBER_VIEWS_EXTENSION", ".jet")
-			}
-			engine := jet.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
-			engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
-				Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
-				Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
-				Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
-			viewsEngine = engine
-			break
-		case "mustache":
-			// Set file extension dynamically to FIBER_VIEWS
-			if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
-				config.Set("FIBER_VIEWS_EXTENSION", ".mustache")
-			}
-			engine := mustache.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
-			engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
-				Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
-				Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
-				Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
-			viewsEngine = engine
-			break
-		case "pug":
-			// Set file extension dynamically to FIBER_VIEWS
-			if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
-				config.Set("FIBER_VIEWS_EXTENSION", ".pug")
-			}
-			engine := pug.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
-			engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
-				Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
-				Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
-				Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
-			viewsEngine = engine
-			break
-		// Use the official html/template package by default
-		default:
-			// Set file extension dynamically to FIBER_VIEWS
-			if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
-				config.Set("FIBER_VIEWS_EXTENSION", ".html")
-			}
-			engine := html.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
-			engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
-				Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
-				Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
-				Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
-			viewsEngine = engine
-			break
+	case "ace":
+		// Set file extension dynamically to FIBER_VIEWS
+		if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
+			config.Set("FIBER_VIEWS_EXTENSION", ".ace")
+		}
+		engine := ace.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
+		engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
+			Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
+			Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
+			Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
+		viewsEngine = engine
+		break
+	case "amber":
+		// Set file extension dynamically to FIBER_VIEWS
+		if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
+			config.Set("FIBER_VIEWS_EXTENSION", ".amber")
+		}
+		engine := amber.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
+		engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
+			Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
+			Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
+			Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
+		viewsEngine = engine
+		break
+	case "django":
+		// Set file extension dynamically to FIBER_VIEWS
+		if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
+			config.Set("FIBER_VIEWS_EXTENSION", ".django")
+		}
+		engine := django.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
+		engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
+			Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
+			Layout(config.GetString("FIBER_VIEWS_LAYOUT"))
+		viewsEngine = engine
+		break
+	case "handlebars":
+		// Set file extension dynamically to FIBER_VIEWS
+		if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
+			config.Set("FIBER_VIEWS_EXTENSION", ".hbs")
+		}
+		engine := handlebars.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
+		engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
+			Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
+			Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
+			Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
+		viewsEngine = engine
+		break
+	case "jet":
+		// Set file extension dynamically to FIBER_VIEWS
+		if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
+			config.Set("FIBER_VIEWS_EXTENSION", ".jet")
+		}
+		engine := jet.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
+		engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
+			Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
+			Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
+			Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
+		viewsEngine = engine
+		break
+	case "mustache":
+		// Set file extension dynamically to FIBER_VIEWS
+		if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
+			config.Set("FIBER_VIEWS_EXTENSION", ".mustache")
+		}
+		engine := mustache.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
+		engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
+			Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
+			Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
+			Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
+		viewsEngine = engine
+		break
+	case "pug":
+		// Set file extension dynamically to FIBER_VIEWS
+		if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
+			config.Set("FIBER_VIEWS_EXTENSION", ".pug")
+		}
+		engine := pug.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
+		engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
+			Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
+			Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
+			Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
+		viewsEngine = engine
+		break
+	// Use the official html/template package by default
+	default:
+		// Set file extension dynamically to FIBER_VIEWS
+		if config.GetString("FIBER_VIEWS_EXTENSION") == "" {
+			config.Set("FIBER_VIEWS_EXTENSION", ".html")
+		}
+		engine := html.New(config.GetString("FIBER_VIEWS_DIRECTORY"), config.GetString("FIBER_VIEWS_EXTENSION"))
+		engine.Reload(config.GetBool("FIBER_VIEWS_RELOAD")).
+			Debug(config.GetBool("FIBER_VIEWS_DEBUG")).
+			Layout(config.GetString("FIBER_VIEWS_LAYOUT")).
+			Delims(config.GetString("FIBER_VIEWS_DELIMS_L"), config.GetString("FIBER_VIEWS_DELIMS_R"))
+		viewsEngine = engine
+		break
 	}
 	return viewsEngine
 }
@@ -420,84 +419,51 @@ func (config *Config) GetHasherConfig() hashing.Config {
 }
 
 func (config *Config) GetSessionConfig() session.Config {
-	var provider fsession.Provider
+	var provider fiber.Storage
 	switch strings.ToLower(config.GetString("SESSION_PROVIDER")) {
 	case "memcache":
-		sessionProvider, err := memcache.New(memcache.Config{
-			KeyPrefix:    config.GetString("SESSION_KEYPREFIX"),
-			ServerList:   []string {
-				config.GetString("SESSION_HOST") + ":" + config.GetString("SESSION_PORT"),
-			},
+		provider = memcache.New(memcache.Config{
+			Servers: config.GetString("SESSION_HOST") + ":" + config.GetString("SESSION_PORT"),
 		})
-		if err != nil {
-			fmt.Println("failed to initialized memcache session provider:", err.Error())
-			break
-		}
-		provider = sessionProvider
-		break
 	case "mysql":
-		sessionProvider, err := mysql.New(mysql.Config{
-			Host:            config.GetString("SESSION_HOST"),
-			Port:            config.GetInt("SESSION_PORT"),
-			Username:        config.GetString("SESSION_USERNAME"),
-			Password:        config.GetString("SESSION_PASSWORD"),
-			Database:        config.GetString("SESSION_DATABASE"),
-			TableName:       config.GetString("SESSION_TABLENAME"),
+		provider = fMysql.New(fMysql.Config{
+			Host:     config.GetString("SESSION_HOST"),
+			Port:     config.GetInt("SESSION_PORT"),
+			Username: config.GetString("SESSION_USERNAME"),
+			Password: config.GetString("SESSION_PASSWORD"),
+			Database: config.GetString("SESSION_DATABASE"),
+			Table:    config.GetString("SESSION_TABLENAME"),
 		})
-		if err != nil {
-			fmt.Println("failed to initialized mysql session provider:", err.Error())
-			break
-		}
-		provider = sessionProvider
-		break
 	case "postgresql", "postgres":
-		sessionProvider, err := postgres.New(postgres.Config{
-			Host:            config.GetString("SESSION_HOST"),
-			Port:            config.GetInt64("SESSION_PORT"),
-			Username:        config.GetString("SESSION_USERNAME"),
-			Password:        config.GetString("SESSION_PASSWORD"),
-			Database:        config.GetString("SESSION_DATABASE"),
-			TableName:       config.GetString("SESSION_TABLENAME"),
+		provider = fPostgres.New(fPostgres.Config{
+			Host:     config.GetString("SESSION_HOST"),
+			Port:     config.GetInt("SESSION_PORT"),
+			Username: config.GetString("SESSION_USERNAME"),
+			Password: config.GetString("SESSION_PASSWORD"),
+			Database: config.GetString("SESSION_DATABASE"),
+			Table:    config.GetString("SESSION_TABLENAME"),
 		})
-		if err != nil {
-			fmt.Println("failed to initialized postgresql session provider:", err.Error())
-			break
-		}
-		provider = sessionProvider
-		break
 	case "redis":
-		sessionProvider, err := redis.New(redis.Config{
-			KeyPrefix:          config.GetString("SESSION_KEYPREFIX"),
-			Addr:               config.GetString("SESSION_HOST") + ":" + config.GetString("SESSION_PORT"),
-			Password:           config.GetString("SESSION_PASSWORD"),
-			DB:                 config.GetInt("SESSION_DATABASE"),
+		provider = fRedis.New(fRedis.Config{
+			Host:     config.GetString("SESSION_HOST"),
+			Port:     config.GetInt("SESSION_PORT"),
+			Username: config.GetString("SESSION_USERNAME"),
+			Password: config.GetString("SESSION_PASSWORD"),
+			Database: config.GetInt("SESSION_DATABASE"),
 		})
-		if err != nil {
-			fmt.Println("failed to initialized redis session provider:", err.Error())
-			break
-		}
-		provider = sessionProvider
-		break
 	case "sqlite3":
-		sessionProvider, err := sqlite3.New(sqlite3.Config{
-			DBPath:          config.GetString("SESSION_DATABASE"),
-			TableName:       config.GetString("SESSION_TABLENAME"),
+		provider = fSQLite.New(fSQLite.Config{
+			Database: config.GetString("SESSION_DATABASE"),
+			Table:    config.GetString("SESSION_TABLENAME"),
 		})
-		if err != nil {
-			fmt.Println("failed to initialized sqlite3 session provider:", err.Error())
-			break
-		}
-		provider = sessionProvider
-		break
 	}
 
 	return session.Config{
-		Lookup:     config.GetString("SESSION_LOOKUP"),
-		Secure:     config.GetBool("SESSION_SECURE"),
-		Domain:     config.GetString("SESSION_DOMAIN"),
-		SameSite:   config.GetString("SESSION_SAMESITE"),
-		Expiration: config.GetDuration("SESSION_EXPIRATION"),
-		Provider:   provider,
-		GCInterval: config.GetDuration("SESSION_GCINTERVAL"),
+		Expiration:     config.GetDuration("SESSION_EXPIRATION"),
+		Storage:        provider,
+		KeyLookup:      config.GetString("SESSION_LOOKUP"),
+		CookieDomain:   config.GetString("SESSION_DOMAIN"),
+		CookieSecure:   config.GetBool("SESSION_SECURE"),
+		CookieSameSite: config.GetString("SESSION_SAMESITE"),
 	}
 }

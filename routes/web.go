@@ -3,13 +3,14 @@ package routes
 import (
 	Controller "fiber-boilerplate/app/controllers/web"
 	"fiber-boilerplate/database"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/session/v2"
-	hashing "github.com/thomasvvugt/fiber-hashing"
 	"log"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	hashing "github.com/thomasvvugt/fiber-hashing"
 )
 
-func RegisterWeb(web fiber.Router, session *session.Session, sessionLookup string, db *database.Database, hasher hashing.Driver) {
+func RegisterWeb(web fiber.Router, session *session.Store, sessionLookup string, db *database.Database, hasher hashing.Driver) {
 	// Homepage
 	web.Get("/", Controller.Index(session, db))
 

@@ -11,13 +11,12 @@ import (
 )
 
 type DatabaseConfig struct {
-	Driver string
-	Host string
+	Driver   string
+	Host     string
 	Username string
 	Password string
-	Port int
+	Port     int
 	Database string
-
 }
 
 type Database struct {

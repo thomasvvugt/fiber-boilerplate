@@ -2,12 +2,13 @@ package web
 
 import (
 	"fiber-boilerplate/database"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/session/v2"
 	"log"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
-func Index(session *session.Session, db *database.Database) fiber.Handler {
+func Index(session *session.Store, db *database.Database) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		auth := IsAuthenticated(session, ctx)
 
@@ -18,9 +19,12 @@ func Index(session *session.Session, db *database.Database) fiber.Handler {
 		}
 
 		if auth {
-			store := session.Get(ctx)
+			store, err := session.Get(ctx)
+			if err != nil {
+				panic(err)
+			}
 			// Get User ID from session store
-			userID, _ := store.Get("userid").(int64)
+			userID := store.Get("userid").(int64)
 			user, err := FindUserByID(db, userID)
 			if err != nil {
 				log.Fatalf("Error when finding user by ID: %v", err)

@@ -3,15 +3,19 @@ package web
 import (
 	"fiber-boilerplate/database"
 	"fmt"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/session/v2"
-	hashing "github.com/thomasvvugt/fiber-hashing"
 	"log"
 	"strings"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
+	hashing "github.com/thomasvvugt/fiber-hashing"
 )
 
-func IsAuthenticated(session *session.Session, ctx *fiber.Ctx) (authenticated bool) {
-	store := session.Get(ctx)
+func IsAuthenticated(session *session.Store, ctx *fiber.Ctx) (authenticated bool) {
+	store, err := session.Get(ctx)
+	if err != nil {
+		panic(err)
+	}
 	// Get User ID from session store
 	userID, correct := store.Get("userid").(int64)
 	if !correct {
@@ -36,7 +40,7 @@ func ShowLoginForm() fiber.Handler {
 	}
 }
 
-func PostLoginForm(hasher hashing.Driver, session *session.Session, db *database.Database) fiber.Handler {
+func PostLoginForm(hasher hashing.Driver, session *session.Store, db *database.Database) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		username := ctx.FormValue("username")
 		// Find user
@@ -53,7 +57,10 @@ func PostLoginForm(hasher hashing.Driver, session *session.Session, db *database
 				log.Fatalf("Error when matching hash for password: %v", err)
 			}
 			if match {
-				store := session.Get(ctx)
+				store, err := session.Get(ctx)
+				if err != nil {
+					panic(err)
+				}
 				defer store.Save()
 				// Set the user ID in the session store
 				store.Set("userid", user.ID)
@@ -73,10 +80,13 @@ func PostLoginForm(hasher hashing.Driver, session *session.Session, db *database
 	}
 }
 
-func PostLogoutForm(sessionLookup string, session *session.Session, db *database.Database) fiber.Handler {
+func PostLogoutForm(sessionLookup string, session *session.Store, db *database.Database) fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		if IsAuthenticated(session, ctx) {
-			store := session.Get(ctx)
+			store, err := session.Get(ctx)
+			if err != nil {
+				panic(err)
+			}
 			store.Delete("userid")
 			if err := store.Save(); err != nil {
 				panic(err.Error())
@@ -85,7 +95,7 @@ func PostLogoutForm(sessionLookup string, session *session.Session, db *database
 			split := strings.Split(sessionLookup, ":")
 			if strings.ToLower(split[0]) == "cookie" {
 				// Unset cookie on client-side
-				ctx.Set("Set-Cookie", split[1] + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; HttpOnly")
+				ctx.Set("Set-Cookie", split[1]+"=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; HttpOnly")
 				if err := ctx.SendString("You are now logged out."); err != nil {
 					panic(err.Error())
 				}

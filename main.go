@@ -11,7 +11,7 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/thomasvvugt/fiber-hashing"
+	hashing "github.com/thomasvvugt/fiber-hashing"
 
 	"github.com/gofiber/fiber/v2"
 
@@ -28,15 +28,15 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 
-	"github.com/gofiber/session/v2"
+	"github.com/gofiber/fiber/v2/middleware/session"
 )
 
 type App struct {
 	*fiber.App
 
-	DB *database.Database
-	Hasher hashing.Driver
-	Session *session.Session
+	DB      *database.Database
+	Hasher  hashing.Driver
+	Session *session.Store
 }
 
 func main() {
@@ -201,9 +201,9 @@ func (app *App) registerMiddlewares(config *configuration.Config) {
 	// Middleware - CSRF
 	if config.GetBool("MW_FIBER_CSRF_ENABLED") {
 		app.Use(csrf.New(csrf.Config{
-			TokenLookup:   config.GetString("MW_FIBER_CSRF_TOKENLOOKUP"),
-			Cookie:        &fiber.Cookie{
-				Name: config.GetString("MW_FIBER_CSRF_COOKIE_NAME"),
+			TokenLookup: config.GetString("MW_FIBER_CSRF_TOKENLOOKUP"),
+			Cookie: &fiber.Cookie{
+				Name:     config.GetString("MW_FIBER_CSRF_COOKIE_NAME"),
 				SameSite: config.GetString("MW_FIBER_CSRF_COOKIE_SAMESITE"),
 			},
 			CookieExpires: config.GetDuration("MW_FIBER_CSRF_COOKIE_EXPIRES"),
@@ -236,8 +236,8 @@ func (app *App) registerMiddlewares(config *configuration.Config) {
 	// Middleware - Limiter
 	if config.GetBool("MW_FIBER_LIMITER_ENABLED") {
 		app.Use(limiter.New(limiter.Config{
-			Max:          config.GetInt("MW_FIBER_LIMITER_MAX"),
-			Duration:     config.GetDuration("MW_FIBER_LIMITER_DURATION"),
+			Max:      config.GetInt("MW_FIBER_LIMITER_MAX"),
+			Duration: config.GetDuration("MW_FIBER_LIMITER_DURATION"),
 			// TODO: Key
 			// TODO: LimitReached
 		}))
@@ -258,7 +258,7 @@ func (app *App) registerMiddlewares(config *configuration.Config) {
 	// Middleware - RequestID
 	if config.GetBool("MW_FIBER_REQUESTID_ENABLED") {
 		app.Use(requestid.New(requestid.Config{
-			Header:     config.GetString("MW_FIBER_REQUESTID_HEADER"),
+			Header: config.GetString("MW_FIBER_REQUESTID_HEADER"),
 			// TODO: Generator
 			ContextKey: config.GetString("MW_FIBER_REQUESTID_CONTEXTKEY"),
 		}))
